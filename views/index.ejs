@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <% include head %>
+</head>
+  <body>
+  <% include header %>
+  <div class="container-fluid">
+    <section class="container">
+      <div class="container-page editprofile">
+        <div class="col-md-12">
+           <div class="col-md-6">  <h1>Employee List</h1></div>
+          <div class="col-md-2" style="margin-top :30px;"><input type="text" name="filter" id="searchValue" onkeyup="findList()" placeholder="Search with index"></div>
+          <div class="col-md-2" style="margin-top :30px;"><a class="btn btn-danger" onclick="checkAboveThirty()">Above 30</a></div>
+          <div class="col-md-2" style="margin-top :30px;"> <a class="btn btn-danger" onclick="getAllData()">All</a></div>
+        </div>
+        <div class="col-md-12 userInfo">
+          <table class="table">
+            <thead>
+            <tr>
+              <th></th>
+              <th>#</th>
+              <th>Name</th>
+              <th>Age</th>
+              <th>Gender</th>
+            </tr>
+            </thead>
+            <tbody>
+            <% for(var i=0; i<userlist.length; i++) {%>
+            <tr>
+              <td><img src="<%= userlist[i].picture %>" name="<%= userlist[i].name %>"/></td>
+              <td><%= userlist[i].index %></td>
+              <td><a href="/contactCard/<%= userlist[i].index %>"><%= userlist[i].name %></a></td>
+              <td><%= userlist[i].age %></td>
+              <td><%= userlist[i].gender %></td>
+            </tr>
+            <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </div>
+  <% include footer %>
+  </body>
+</html>
+
+
+
+<script>
+
+    /*  ----------------------------------------------------
+    Render list by Index
+    ----------------------------------------------------   */
+
+    function findList() {
+        var searchValue = $('#searchValue').val();
+        var htmltext = "";
+        $('table tbody').empty();
+        if(searchValue) {
+            $.get("/filterBynameOrIndex/"+searchValue,function(data){
+                $.each(data, function( index, row ){
+                    if(row.isActive) {
+                        htmltext += "<tr><td><img src=" + row.picture + "/><td>" + row.index + "</td><td><a href='contactCard/"+row.index+"'>" + row.name + "</a></td><td>" + row.age + "</td><td>" + row.gender + "</td></tr></tbody>"
+                        $("table tbody").append(htmltext);
+                    }
+                });
+            });
+        } else {
+            $.get("/getAllEmployeeList",function(data){
+                $.each(data, function( index, row ){
+                        htmltext += "<tr><td><img src=" + row.picture + "/><td>" + row.index + "</td><td><a  href='contactCard/"+row.index+"'>" + row.name + "</a></td><td>" + row.age + "</td><td>" + row.gender + "</td></tr></tbody>"
+                        $("table tbody").append(htmltext);
+                });
+
+            });
+        }
+    }
+
+    /*  ----------------------------------------------------
+    Render above 30 age data
+    ----------------------------------------------------   */
+
+    function checkAboveThirty() {
+        var htmltext = "";
+        $('table tbody').empty();
+        $.get("/getAllEmployeeList",function(data){
+            $.each(data, function( index, row ){
+                if(row.age  > 30 ) {
+                    htmltext += "<tr><td><img src=" + row.picture + "/><td>" + row.index + "</td><td><a  href='contactCard/"+row.index+"'>" + row.name + "</a></td><td>" + row.age + "</td><td>" + row.gender + "</td></tr></tbody>"
+                    $("table tbody").append(htmltext);
+                }
+            });
+
+        });
+    }
+
+    /*  ----------------------------------------------------
+      Get All data
+    ----------------------------------------------------   */
+
+    function getAllData() {
+        var htmltext = "";
+        $('table tbody').empty();
+        $.get("/getAllEmployeeList",function(data){
+            $.each(data, function( index, row ){
+                    htmltext += "<tr><td><img src=" + row.picture + "/><td>" + row.index + "</td><td><a  href='contactCard/"+row.index+"'>" + row.name + "</a></td><td>" + row.age + "</td><td>" + row.gender + "</td></tr></tbody>"
+                   $("table tbody").append(htmltext);
+            });
+
+        });
+    }
+
+</script>
